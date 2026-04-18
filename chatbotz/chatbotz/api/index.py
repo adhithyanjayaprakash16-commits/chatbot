@@ -26,11 +26,12 @@ from ticket_generator import create_pdf_ticket
 
 # Load model and data with local paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# ROOT_DIR is still the physical project root for model files
 ROOT_DIR = os.path.dirname(BASE_DIR)
 
 app = Flask(__name__, 
-            template_folder=os.path.join(ROOT_DIR, 'templates'), 
-            static_folder=os.path.join(ROOT_DIR, 'static'))
+            template_folder='templates', 
+            static_folder='static')
 lemmatizer = WordNetLemmatizer()
 user_sessions = {}
 
