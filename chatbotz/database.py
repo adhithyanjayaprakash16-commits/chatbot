@@ -1,13 +1,7 @@
 import sqlite3
 import os
 
-# Use /tmp/ for database if on Vercel or read-only environment
-def get_db_path():
-    if os.environ.get('VERCEL'):
-        return "/tmp/adhibus_bookings.db"
-    return os.path.join(os.getcwd(), "adhibus_bookings.db")
-
-DB_NAME = get_db_path()
+DB_NAME = "adhibus_bookings.db"
 
 def init_db():
     conn = sqlite3.connect(DB_NAME)

@@ -1,79 +1,69 @@
-const chatBox = document.getElementById('chat-box');
-const userInput = document.getElementById('user-input');
-const sendBtn = document.getElementById('send-btn');
-const typingIndicator = document.getElementById('typing-indicator');
+document.addEventListener('DOMContentLoaded', () => {
+    const chatArea = document.getElementById('chatArea');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
 
-// Scroll chat to end
-function scrollToBottom() {
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-// Simple Markdown Link Parser
-function parseMarkdown(text) {
-    // Handle specific bold syntax
-    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    // Handle [text](url) links
-    text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="ticket-link">$1</a>');
-    // Handle newlines
-    return text.replace(/\n/g, '<br>');
-}
-
-// Append message to UI
-function appendMessage(text, sender) {
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
-    
-    // Parse the text for our custom Markdown features
-    const formattedContent = parseMarkdown(text);
-    
-    messageDiv.innerHTML = `<div class="content">${formattedContent}</div>`;
-    
-    chatBox.appendChild(messageDiv);
-    scrollToBottom();
-}
-
-// Handle Quick Action Buttons
-function quickAction(text) {
-    userInput.value = text;
-    sendMessage();
-}
-
-// Main Send Function
-async function sendMessage() {
-    const msg = userInput.value.trim();
-    if (!msg) return;
-
-    appendMessage(msg, 'user');
-    userInput.value = '';
-
-    typingIndicator.style.display = 'block';
-    scrollToBottom();
-
-    try {
-        const formData = new FormData();
-        formData.append('msg', msg);
-
-        const response = await fetch('/get', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const data = await response.json();
-        
-        // Slight delay to feel more natural
-        setTimeout(() => {
-            typingIndicator.style.display = 'none';
-            appendMessage(data.response, 'bot');
-        }, 600);
-        
-    } catch (error) {
-        console.error('Error:', error);
-        typingIndicator.style.display = 'none';
-        appendMessage("Adhii is resting. Please try again in a bit!", 'bot');
+    function getTimestamp() {
+        const now = new Date();
+        return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
-}
 
-sendBtn.addEventListener('click', sendMessage);
-userInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendMessage();
+    function appendMessage(msg, isUser = false) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${isUser ? 'user-msg' : 'bot-msg'}`;
+        
+        // Handle markdown-style links or bold text occasionally sent by bot
+        const formattedMsg = msg.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
+                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+        msgDiv.innerHTML = `
+            <div class="bubble">${formattedMsg}</div>
+            <span class="timestamp">${getTimestamp()}</span>
+        `;
+        
+        chatArea.appendChild(msgDiv);
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    async function sendMessage(text) {
+        if (!text.trim()) return;
+
+        appendMessage(text, true);
+        userInput.value = '';
+        
+        // Show typing indicator
+        typingIndicator.style.display = 'flex';
+        chatArea.scrollTop = chatArea.scrollHeight;
+
+        try {
+            const response = await fetch('/get', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `msg=${encodeURIComponent(text)}`
+            });
+            
+            const data = await response.json();
+            
+            // Artificial delay for realism
+            setTimeout(() => {
+                typingIndicator.style.display = 'none';
+                appendMessage(data.response);
+            }, 800);
+
+        } catch (error) {
+            typingIndicator.style.display = 'none';
+            appendMessage("I'm having trouble connecting to the server. Please check your connection.");
+        }
+    }
+
+    sendBtn.addEventListener('click', () => sendMessage(userInput.value));
+    
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage(userInput.value);
+    });
+
+    window.quickAction = (text) => {
+        sendMessage(text);
+    };
 });

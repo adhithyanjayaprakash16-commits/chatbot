@@ -1,35 +1,41 @@
 from flask import Flask, render_template, request, jsonify
+import os
 import json
 import pickle
 import numpy as np
 import nltk
-from nltk.stem import WordNetLemmatizer
+from nltk.stem import PorterStemmer
 import random
 from textblob import TextBlob
 
-# PRO Feature Imports
 from database import init_db, save_booking, log_query
 from ticket_generator import create_pdf_ticket
 
-app = Flask(__name__, template_folder='api/templates', static_folder='api/static')
-lemmatizer = WordNetLemmatizer()
+app = Flask(__name__, template_folder='templates', static_folder='static')
+stemmer = PorterStemmer()
 user_sessions = {}
 
 # Initialize Database
 init_db()
 
-# Load model and data
+# Load model and data from root folder
+def load_local_file(filename, mode='rb'):
+    with open(filename, mode) as f:
+        if filename.endswith('.json'):
+            return json.load(f)
+        return pickle.load(f)
+
 try:
-    intents = json.loads(open('intents.json').read())
-    words = pickle.load(open('words.pkl', 'rb'))
-    classes = pickle.load(open('classes.pkl', 'rb'))
-    model = pickle.load(open('chatbot_model.pkl', 'rb'))
+    intents = load_local_file('intents.json', 'r')
+    words = load_local_file('words.pkl')
+    classes = load_local_file('classes.pkl')
+    model = load_local_file('chatbot_model.pkl')
 except Exception as e:
     print(f"Error loading model artifacts: {e}")
 
 def clean_up_sentence(sentence):
     sentence_words = nltk.word_tokenize(sentence)
-    sentence_words = [lemmatizer.lemmatize(word.lower()) for word in sentence_words]
+    sentence_words = [stemmer.stem(word.lower()) for word in sentence_words]
     return sentence_words
 
 def bow(sentence, words):
@@ -179,6 +185,13 @@ def chatbot_response():
     msg = request.form["msg"]
     res = handle_dialogue("demo_user", msg)
     return jsonify({"response": res})
+
+@app.route("/download_ticket/<pnr>")
+def download_ticket(pnr):
+    from flask import send_from_directory
+    # Local path: static/tickets
+    local_dir = os.path.join(os.getcwd(), 'static', 'tickets')
+    return send_from_directory(local_dir, f"ticket_{pnr}.pdf", as_attachment=True)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

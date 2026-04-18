@@ -3,59 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adhii - TN Bus Booking Assistant</title>
+    <title>Adhii Bus | Modern AI Assistant</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <div class="intro-pane">
-            <h1>Adhii</h1>
-            <p>Your intelligent companion for bus travel across Tamil Nadu. Search, book, and track in seconds.</p>
-            <div class="quick-links">
-                <button class="action-btn" onclick="quickAction('I want to book a ticket')">🎫 Book Ticket</button>
-                <button class="action-btn" onclick="quickAction('Show me bus timings')">🕒 Bus Timings</button>
-                <button class="action-btn" onclick="quickAction('Where is my bus?')">📍 Live Tracking</button>
-                <button class="action-btn" onclick="quickAction('Cancellation policy')">❌ Cancellation</button>
-                <button class="action-btn" onclick="quickAction('Emergency contact')">🆘 Support</button>
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+
+    <main id="chat-app">
+        <!-- Header -->
+        <header class="chat-header">
+            <div class="brand">
+                <div class="logo-circle">
+                    <i class="fas fa-bus"></i>
+                </div>
+                <div class="header-info">
+                    <h1>Adhii Bus AI</h1>
+                    <p>Smart Travel Partner for Tamil Nadu</p>
+                </div>
             </div>
-        </div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>AI Core Online</span>
+            </div>
+        </header>
 
         <!-- Chat Area -->
-        <div class="chat-wrapper">
-            <div class="chat-header">
-                <div class="avatar">
-                    <img src="{{ url_for('static', filename='avatar.png') }}" alt="Adhii Avatar">
+        <div class="chat-body" id="chatArea">
+            <!-- Welcome Message -->
+            <div class="message bot-msg">
+                <div class="bubble">
+                    Welcome to <strong>Adhii Bus Travels</strong>! 🚌<br>
+                    I can help you check routes, book tickets, and manage your trips across Tamil Nadu. How can I help you today?
                 </div>
-                <div class="title-meta">
-                    <h2>Adhii Bot</h2>
-                    <span class="online-status">● Online</span>
-                </div>
-            </div>
-
-            <div id="chat-box" class="chat-box">
-                <div class="message bot-message">
-                    <div class="content">Vanakkam! I'm Adhii. How can I assist you with your Tamil Nadu travel today?</div>
-                </div>
-                <!-- Messages will appear here -->
-            </div>
-
-            <div id="typing-indicator" class="typing" style="display: none;">Adhii is typing...</div>
-
-            <div class="chat-footer">
-                <div class="input-group">
-                    <input type="text" id="user-input" placeholder="Ask about buses, routes, or tickets..." autocomplete="off">
-                    <button id="send-btn" title="Send Message">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                    </button>
-                </div>
+                <span class="timestamp">Just now</span>
             </div>
         </div>
-    </div>
+
+        <!-- Typing Indicator -->
+        <div class="quick-actions-container">
+            <div class="typing" id="typingIndicator">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions-container">
+            <button class="action-btn" onclick="quickAction('Book a bus')"><i class="fas fa-ticket"></i> Book Ticket</button>
+            <button class="action-btn" onclick="quickAction('Bus Timings')"><i class="fas fa-clock"></i> Bus Timings</button>
+            <button class="action-btn" onclick="quickAction('Cancel booking')"><i class="fas fa-xmark"></i> Cancel</button>
+            <button class="action-btn" onclick="quickAction('Check PNR')"><i class="fas fa-search"></i> PNR Status</button>
+            <button class="action-btn" onclick="quickAction('Refund policy')"><i class="fas fa-money-bill"></i> Refunds</button>
+        </div>
+
+        <!-- Footer / Input -->
+        <footer class="chat-footer">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" placeholder="Ask about routes, fares, booking..." autocomplete="off">
+                <button class="send-btn" id="sendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <p class="disclaimer">Adhii Chatbot v2.0 | Academic Project Demo</p>
+        </footer>
+    </main>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>

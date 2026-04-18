@@ -4,7 +4,7 @@ import numpy as np
 import random
 import os
 import nltk
-from nltk.stem import WordNetLemmatizer
+from nltk.stem import PorterStemmer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
@@ -14,13 +14,12 @@ import seaborn as sns
 # Ensure NLTK packages are downloaded
 nltk.download('punkt', quiet=True)
 nltk.download('punkt_tab', quiet=True)
-nltk.download('wordnet', quiet=True)
 
-lemmatizer = WordNetLemmatizer()
+stemmer = PorterStemmer()
 
 # Load the intents dataset
 try:
-    with open('intents.json', 'r') as file:
+    with open('api/intents.json', 'r') as file:
         intents = json.load(file)
 except FileNotFoundError:
     print("Error: intents.json file not found.")
@@ -41,19 +40,19 @@ for intent in intents['intents']:
         if intent['tag'] not in classes:
             classes.append(intent['tag'])
 
-words = [lemmatizer.lemmatize(word.lower()) for word in words if word not in ignore_letters]
+words = [stemmer.stem(word.lower()) for word in words if word not in ignore_letters]
 words = sorted(set(words))
 classes = sorted(set(classes))
 
-pickle.dump(words, open('words.pkl', 'wb'))
-pickle.dump(classes, open('classes.pkl', 'wb'))
+pickle.dump(words, open('api/words.pkl', 'wb'))
+pickle.dump(classes, open('api/classes.pkl', 'wb'))
 
 X = []
 y = []
 
 for doc in documents:
     bag = []
-    word_patterns = [lemmatizer.lemmatize(word.lower()) for word in doc[0]]
+    word_patterns = [stemmer.stem(word.lower()) for word in doc[0]]
     for word in words:
         bag.append(1) if word in word_patterns else bag.append(0)
     X.append(bag)
@@ -89,5 +88,5 @@ plt.title('Bus Chatbot Confusion Matrix')
 plt.tight_layout()
 plt.savefig('output/confusion_matrix.png')
 
-pickle.dump(model, open('chatbot_model.pkl', 'wb'))
+pickle.dump(model, open('api/chatbot_model.pkl', 'wb'))
 print("Model and evaluation metrics saved.")
