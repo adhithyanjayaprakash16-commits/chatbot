@@ -1,6 +1,0 @@
-Flask
-nltk
-numpy
-scikit-learn
-fpdf
-textblob
