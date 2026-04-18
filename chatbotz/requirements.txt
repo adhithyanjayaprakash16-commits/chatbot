@@ -2,8 +2,5 @@ Flask
 nltk
 numpy
 scikit-learn
-matplotlib
-seaborn
-pickle-mixin
 fpdf
 textblob

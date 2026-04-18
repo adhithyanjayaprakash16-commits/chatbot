@@ -1,4 +1,5 @@
 import os
+
 from flask import Flask, render_template, request, jsonify
 import json
 import pickle
@@ -7,6 +8,10 @@ import nltk
 import random
 from textblob import TextBlob
 from nltk.stem import WordNetLemmatizer
+
+# Define paths for model loading
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(BASE_DIR)
 
 # Vercel-specific: Download NLTK data to /tmp
 import nltk
@@ -24,7 +29,10 @@ except LookupError:
 from database import init_db, save_booking, log_query
 from ticket_generator import create_pdf_ticket
 
-app = Flask(__name__, template_folder='../templates', static_folder='../static')
+
+app = Flask(__name__, 
+            template_folder='templates', 
+            static_folder='static')
 lemmatizer = WordNetLemmatizer()
 user_sessions = {}
 
@@ -34,9 +42,6 @@ try:
 except Exception as e:
     print(f"Database init skipped (Read-only filesystem): {e}")
 
-# Load model and data with local paths
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.dirname(BASE_DIR)
 
 def load_file(filename, mode='rb'):
     # Try parent directory (root) first, then current directory (api/)

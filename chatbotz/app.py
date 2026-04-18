@@ -11,7 +11,7 @@ from textblob import TextBlob
 from database import init_db, save_booking, log_query
 from ticket_generator import create_pdf_ticket
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='api/templates', static_folder='api/static')
 lemmatizer = WordNetLemmatizer()
 user_sessions = {}
 
